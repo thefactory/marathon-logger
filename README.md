@@ -2,20 +2,17 @@ Event logging service for [Marathon](https://github.com/mesosphere/marathon) Mes
 
 ## Overview
 
-marathon-logger is a Marathon event subscriber that logs each event it receives.
+marathon-logger is a Marathon event subscriber that logs each event to a pluggable event store.
 
 On launch, it registers itself with the Marathon server. On exit, it deregisters itself.
-
-Each event is stored in-memory and printed to stdout, and the most recent `MAX_LENGTH` events available via a HTTP
-`GET` to `/events`.
 
 ## Usage
 
 ### Running the service
 ```console
 $ python marathon-logger.py -h
-usage: marathon-logger.py [-h] [-m MARATHON_URL] [-c CALLBACK_URL]
-                          [-l MAX_LENGTH] [-p PORT]
+usage: marathon-logger.py [-h] -m MARATHON_URL -c CALLBACK_URL
+                          [-e EVENT_STORE] [-p PORT]
 
 Marathon Logging Service
 
@@ -26,8 +23,9 @@ optional arguments:
   -c CALLBACK_URL, --callback-url CALLBACK_URL
                         callback URL for this service
                         (http[s]://<host>:<port>[<path>]/events
-  -l MAX_LENGTH, --max-length MAX_LENGTH
-                        Max number of events to store in memory (default: 100)
+  -e EVENT_STORE, --event-store EVENT_STORE
+                        event store connection string (default: in-
+                        memory://localhost/)
   -p PORT, --port PORT  Port to listen on (default: 5000)
 ```
 
@@ -39,11 +37,11 @@ Example:
 python marathon-logger.py \
     -m http://marathon.mycompany.com/ \
     -c http://marathon-logger.mycompany.com/events \
-    -l 10000
+    -e in-memory://localhost/?max_length=1000
 ```
 
 ### Retrieving events
-The most recent `MAX_LENGTH` events are available via a HTTP `GET` to `/events`.
+Events are available via a HTTP `GET` to `/events`. _Note: not available with the `syslog` store type_
 
 Example (using [httpie](https://github.com/jakubroztocil/httpie)):
 ```console
@@ -70,4 +68,26 @@ Server: Werkzeug/0.9.6 Python/2.7.5
         }
     ]
 }
+```
+
+## Event Stores
+
+### In-Memory
+Store up to `max_length` events in memory. Safe for multiple threads, but not for multiple processes.
+
+Parameters:
+* `max_length` - [optional, default: 100] max number of events to store
+
+Example connection string
+```
+in-memory://localhost/?max_length=1000
+```
+
+### Syslog (UDP)
+Forward events to a syslog server via UDP. This event store has no retrieval capability, so `GET /events` will always
+return zero results.
+
+Example connection string:
+```
+syslog://localhost:514/
 ```
