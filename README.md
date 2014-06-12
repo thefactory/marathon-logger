@@ -8,6 +8,12 @@ On launch, it registers itself with the Marathon server. On exit, it deregisters
 
 ## Usage
 
+### Installing the requirements
+You'll need the [flask](http://flask.pocoo.org/) and [marathon](https://github.com/thefactory/marathon-python) Python packages:
+```bash
+pip install -r requirements.txt
+```
+
 ### Running the service
 ```console
 $ python marathon-logger.py -h
