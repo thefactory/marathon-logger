@@ -36,6 +36,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--callback-url', required=True, help='callback URL for this service (http[s]://<host>:<port>[<path>]/events')
     parser.add_argument('-e', '--event-store', default='in-memory://localhost/', help='event store connection string (default: in-memory://localhost/)')
     parser.add_argument('-p', '--port', type=int, default=5000, help='Port to listen on (default: 5000)')
+    parser.add_argument('-i', '--ip', default='0.0.0.0', help='IP to listen on (default: 0.0.0.0)')
     args = parser.parse_args()
 
     event_store_url = urlparse.urlparse(args.event_store)
@@ -52,5 +53,5 @@ if __name__ == '__main__':
     m.create_event_subscription(args.callback_url)
     atexit.register(on_exit, m, args.callback_url)
 
-    app.run(port=args.port)
+    app.run(port=args.port, host=args.ip)
 

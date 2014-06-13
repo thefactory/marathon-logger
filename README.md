@@ -9,7 +9,7 @@ On launch, it registers itself with the Marathon server. On exit, it deregisters
 ## Usage
 
 ### Installing the requirements
-You'll need the [flask](http://flask.pocoo.org/) and [marathon](https://github.com/thefactory/marathon-python) Python packages:
+Unless using the Docker image, you'll need the [flask](http://flask.pocoo.org/) and [marathon](https://github.com/thefactory/marathon-python) Python packages:
 ```bash
 pip install -r requirements.txt
 ```
@@ -41,6 +41,15 @@ callback URL of the service.
 Example:
 ```bash
 python marathon-logger.py \
+    -m http://marathon.mycompany.com/ \
+    -c http://marathon-logger.mycompany.com/events \
+    -e in-memory://localhost/?max_length=1000
+```
+
+### Running via Docker
+marathon-logger is available from the Docker Hub at [thefactory/marathon-logger](https://registry.hub.docker.com/u/thefactory/marathon-logger/):
+```bash
+docker run -P thefactory/marathon-logger \
     -m http://marathon.mycompany.com/ \
     -c http://marathon-logger.mycompany.com/events \
     -e in-memory://localhost/?max_length=1000
