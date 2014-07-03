@@ -9,6 +9,9 @@ class InMemoryStore(object):
     def __init__(self, url):
         qa = urlparse.parse_qs(url.query)
         max_length = int(qa.get('max_length', ['100'])[0])
+
+        print 'Configuring in-memory store with {settings}'.format(settings={"max_length": max_length})
+
         self.events = collections.deque(maxlen=max_length)
 
     def save(self, event):
@@ -22,9 +25,11 @@ class InMemoryStore(object):
 class SyslogUdpStore(object):
 
     def __init__(self, url):
-        server = url.netloc
+        server = url.hostname
         port = url.port or logging.handlers.SYSLOG_UDP_PORT
         address = (server, port)
+
+        print 'Configuring syslog-udp store with {settings}'.format(settings={"server": server, "port": port})
 
         self.log = logging.getLogger('marathon-logger')
         facility = logging.handlers.SysLogHandler.LOG_USER
